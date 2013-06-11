@@ -114,6 +114,7 @@ func (md *MDDev) Attach() error {
 		return er
 	}
 
+	md.attached = true
 	return nil
 }
 
