@@ -143,7 +143,10 @@ func (md *MDDev) Detach() error {
 		defer C.free(unsafe.Pointer(md.mdio.md_file))
 	}
 
-	_, er = C.hack_ioctl1(fd, C.MDIOCDETACH, unsafe.Pointer(&md.mdio))
+	tmpMdio := C.struct_md_ioctl{}
+	tmpMdio.md_unit = md.mdio.md_unit
+
+	_, er = C.hack_ioctl1(fd, C.MDIOCDETACH, unsafe.Pointer(&tmpMdio))
 	if er != nil {
 		return er
 	}
