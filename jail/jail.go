@@ -10,7 +10,6 @@ package jail
 import "C"
 import (
 	"net"
-	"os"
 	"os/exec"
 	"strconv"
 	"syscall"
@@ -233,11 +232,11 @@ func (j *Jail) SetCpusetId(id int) error {
 }
 
 // Exec spawns a process in the jail. It functions similarly to os.Exec, 
-// but it returns the underlying Process rather than having a nice interface
+// but it returns the underlying Cmd rather than having a nice interface
 // around it. Note that cmd is a path within the jail's chroot. The command
 // is executed with uid/gid=0; the command must setuid away the privledges
 // if necessary.
-func (j *Jail) Exec(cmd string, args ...string) (*os.Process, error) {
+func (j *Jail) Exec(cmd string, args ...string) (*exec.Cmd, error) {
 	/* This is kind of a hack, but implementing this in Go is a non-trivial amount of code;
 	 * basically, we need to fork+jail_attach+execvp, but forking has ... strange implications.
 	 * Instead, we rely on another binary to leverage Go's built-in Exec stuff. */
@@ -252,7 +251,7 @@ func (j *Jail) Exec(cmd string, args ...string) (*os.Process, error) {
 		return nil, er
 	}
 
-	return cmdHandle.Process, nil
+	return cmdHandle, nil
 }
 
 // Attach locks the current process in the specified jail.
