@@ -31,6 +31,8 @@ func nmount(options map[string][]byte, flags int) (*MountInfo, error) {
 
 	for k, value := range options {
 		key := []byte(k)
+		key = append(key, 0)
+		value = append(value, 0)
 
 		iov.iov_base = unsafe.Pointer(&key[0])
 		iov.iov_len = C.size_t(len(key))
