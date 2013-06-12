@@ -241,11 +241,11 @@ func (j *Jail) Exec(cmd string, args ...string) (*exec.Cmd, error) {
 	 * basically, we need to fork+jail_attach+execvp, but forking has ... strange implications.
 	 * Instead, we rely on another binary to leverage Go's built-in Exec stuff. */
 	newArgs := make([]string, len(args)+2)
-	newArgs[0] = cmd
-	newArgs[1] = strconv.FormatInt(int64(j.jid), 10)
+	newArgs[0] = strconv.FormatInt(int64(j.jid), 10)
+	newArgs[1] = cmd
 	copy(newArgs[2:], args)
 
-	cmdHandle := exec.Command("jexec", args...)
+	cmdHandle := exec.Command("jexec", newArgs...)
 
 	if er := cmdHandle.Run(); er != nil {
 		return nil, er
