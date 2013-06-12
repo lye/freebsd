@@ -231,6 +231,51 @@ func (j *Jail) SetCpusetId(id int) error {
 	return nil
 }
 
+// IpAddrs returns the IP addresses assigned to this jail.
+//
+// XXX: Currently only returns IPv4 addresses, due to how Refresh works.
+func (j *Jail) IpAddrs() []net.IP {
+	return j.addrs
+}
+
+// SetIpAddrs assigns a new list of IP addresses to this jail, overwriting what
+// was previously set. The addrs param can contain a heterogeneous mix of both
+// IPv4 and IPv6 addresses.
+func (j *Jail) SetIpAddrs(addrs []net.IP) error {
+	jpps := jailParamList{}
+	defer jpps.release()
+
+	ip4addrs := []net.IP{}
+	ip6addrs := []net.IP{}
+
+	for _, addr := range addrs {
+		if ip4addr := addr.To4(); ip4addr != nil {
+			ip4addrs = append(ip4addrs, ip4addr)
+
+		} else {
+			ip6addrs = append(ip6addrs, addr)
+		}
+	}
+
+	params := map[string]interface{}{
+		"jid":      &j.jid,
+		"ip4.addr": ip4addrs,
+		"ip6.addr": ip6addrs,
+	}
+
+	if er := jpps.bindParameters(params); er != nil {
+		return er
+	}
+
+	if _, er := C.jailparam_set(&jpps.params[0], jpps.numParams(), C.JAIL_UPDATE); er != nil {
+		return er
+	}
+
+	j.addrs = addrs
+
+	return nil
+}
+
 // Exec wraps a command with `jexec` such that it can be spawned within the
 // receiving jail. Since much of the Command functionality is exposed via
 // settable fields before starting the command (e.g., env, stdin/out, etc)
