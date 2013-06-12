@@ -92,7 +92,13 @@ func jailParamTypeCoerce(name string, iface interface{}) (ptr unsafe.Pointer, pt
 			return nil, 0, fmt.Errorf("Parameter `%s' must be a []net.IP or []*net.IP", name)
 		}
 
-		return unsafe.Pointer(&buf.Bytes()[0]), buf.Len(), nil
+		if buf.Len() > 0 {
+			return unsafe.Pointer(&buf.Bytes()[0]), buf.Len(), nil
+
+		} else {
+			/* XXX: Not sure if this is how we encode an empty slice? */
+			return nil, 0, nil
+		}
 	}
 
 	return nil, 0, fmt.Errorf("Unknown type for parameter `%s'", name)
