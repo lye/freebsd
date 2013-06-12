@@ -164,6 +164,16 @@ func (md *MDDev) Path() string {
 	return md.path
 }
 
+// MallocBacked returns true iff the MDDev is malloc-backed.
+func (md *MDDev) MallocBacked() bool {
+	return md.mdio.md_type == C.MD_MALLOC
+}
+
+// VnodeBacked returns true iff the MDDev is vnode-backed (e.g., is a file).
+func (md *MDDev) VnodeBacked() bool {
+	return md.mdio.md_type == C.MD_VNODE
+}
+
 // DevicePath returns the path to the md device, which can then be mounted as
 // a filesystem.
 func (md *MDDev) DevicePath() (string, error) {
