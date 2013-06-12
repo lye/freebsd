@@ -177,7 +177,7 @@ func (j *Jail) SetHostname(hostname string) error {
 	defer jpps.release()
 
 	params := map[string]interface{}{
-		"jid":           j.jid,
+		"jid":           &j.jid,
 		"host.hostname": hostname,
 	}
 
@@ -214,7 +214,7 @@ func (j *Jail) SetCpusetId(id int) error {
 	defer jpps.release()
 
 	params := map[string]interface{}{
-		"jid":       j.jid,
+		"jid":       &j.jid,
 		"cpuset.id": id,
 	}
 
